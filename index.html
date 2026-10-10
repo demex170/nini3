@@ -1,0 +1,865 @@
+
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#080609">
+<meta name="description" content="ერთი პატარა, კინემატოგრაფიული ისტორია">
+<title>ერთი პატარა ისტორია ❤️</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Noto+Serif+Georgian:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #080609;
+  --wine: #7d1d35;
+  --red: #d34b66;
+  --gold: #e6c69a;
+  --white: #fff8f4;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--white);
+  font-family: 'Noto Serif Georgian', serif;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+button {
+  font: inherit;
+}
+
+.stage {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse at 50% 45%, #281019 0%, #100a10 45%, #050406 100%);
+}
+
+/* ვიდეოს გაუწელავი, მაღალი ხარისხის ჩვენება */
+#video {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center center;
+  background: #080609;
+  opacity: 0;
+  transition: opacity 500ms ease;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+#video.visible {
+  opacity: 1;
+}
+
+/* ვერტიკალურ ეკრანზე ვიდეო მთლიანად ჩანს */
+@media (orientation: portrait) {
+  #video {
+    object-fit: contain;
+    object-position: center;
+  }
+}
+
+/* ფართო ეკრანზე ინარჩუნებს თავდაპირველ პროპორციებს */
+@media (orientation: landscape) {
+  #video {
+    object-fit: contain;
+    object-position: center;
+  }
+}
+
+.shade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0,0,0,.40) 0%,
+      transparent 27%,
+      transparent 57%,
+      rgba(0,0,0,.55) 100%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(0,0,0,.10),
+      transparent 50%,
+      rgba(0,0,0,.10)
+    );
+}
+
+.grain {
+  position: absolute;
+  inset: -50%;
+  z-index: 2;
+  pointer-events: none;
+  opacity: .035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E");
+  animation: grainMove .25s steps(2) infinite;
+}
+
+@keyframes grainMove {
+  0% { transform: translate(0,0); }
+  25% { transform: translate(2%,-1%); }
+  50% { transform: translate(-1%,2%); }
+  75% { transform: translate(1%,1%); }
+  100% { transform: translate(-2%,-1%); }
+}
+
+.topline {
+  position: absolute;
+  z-index: 5;
+  top: max(22px, env(safe-area-inset-top));
+  left: 24px;
+  right: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+}
+
+.brand {
+  font-family: 'Marcellus', serif;
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: rgba(255,248,244,.75);
+  text-transform: uppercase;
+}
+
+.scene-number {
+  color: var(--gold);
+  font-family: 'Marcellus', serif;
+  font-size: 11px;
+  letter-spacing: 3px;
+}
+
+.sound {
+  position: absolute;
+  z-index: 10;
+  right: 20px;
+  bottom: max(22px, env(safe-area-inset-bottom));
+  width: 43px;
+  height: 43px;
+  display: grid;
+  place-items: center;
+  color: white;
+  background: rgba(10,7,10,.78);
+  border: 1px solid rgba(230,198,154,.45);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.sound svg {
+  width: 18px;
+  height: 18px;
+}
+
+.progress {
+  position: absolute;
+  z-index: 11;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: rgba(255,255,255,.13);
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--wine), var(--gold));
+  transition: width .12s linear;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding:
+    max(75px, env(safe-area-inset-top))
+    24px
+    max(85px, env(safe-area-inset-bottom));
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .6s ease, visibility .6s ease;
+}
+
+.overlay.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.content {
+  width: min(100%, 580px);
+  margin: auto;
+  transform: translateY(18px);
+  transition: transform .7s cubic-bezier(.2,.75,.2,1);
+}
+
+.overlay.active .content {
+  transform: translateY(0);
+}
+
+.eyebrow {
+  display: block;
+  margin-bottom: 22px;
+  color: var(--gold);
+  font-family: 'Marcellus', serif;
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 0 auto;
+  color: var(--white);
+  font-size: clamp(25px, 5.5vw, 43px);
+  line-height: 1.65;
+  font-weight: 500;
+  text-wrap: balance;
+  text-shadow: 0 3px 25px rgba(0,0,0,.75);
+}
+
+.title .accent {
+  color: #f0c7ce;
+}
+
+.subtitle {
+  margin: 18px auto 0;
+  color: rgba(255,248,244,.82);
+  font-size: 13px;
+  line-height: 2;
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 13px;
+  flex-wrap: wrap;
+  margin-top: 32px;
+}
+
+.btn {
+  position: relative;
+  min-width: 145px;
+  min-height: 52px;
+  padding: 14px 24px;
+  border: 1px solid rgba(230,198,154,.68);
+  color: var(--white);
+  background: rgba(20,10,16,.94);
+  font-size: 13px;
+  letter-spacing: .4px;
+  cursor: pointer;
+  transition:
+    background .25s ease,
+    border-color .25s ease,
+    transform .25s ease,
+    color .25s ease;
+}
+
+.btn-primary {
+  color: #1a0d12;
+  background: linear-gradient(135deg, #f0d7b4, #c99a73);
+  border-color: #e8c6a0;
+  font-weight: 600;
+}
+
+.btn-primary:hover {
+  background: #fff0d9;
+  transform: translateY(-2px);
+}
+
+.btn-secondary:hover {
+  background: rgba(125,29,53,.85);
+  border-color: var(--red);
+}
+
+.btn:focus-visible,
+.sound:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 5px;
+}
+
+.ending {
+  position: absolute;
+  z-index: 6;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  text-align: center;
+  background: rgba(5,4,6,.24);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 1.5s ease, visibility 1.5s ease;
+}
+
+.ending.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.ending-text {
+  margin: 0;
+  font-size: clamp(29px, 7vw, 48px);
+  line-height: 1.7;
+  font-weight: 500;
+  color: #fff4ec;
+  text-shadow: 0 3px 40px rgba(0,0,0,.9);
+  animation: endingGlow 4s ease-in-out infinite alternate;
+}
+
+.ending-text span {
+  color: #f1c7ce;
+}
+
+@keyframes endingGlow {
+  from { text-shadow: 0 0 15px rgba(211,75,102,.15); }
+  to { text-shadow: 0 0 35px rgba(211,75,102,.4); }
+}
+
+@media (max-width: 480px) {
+  .topline {
+    left: 18px;
+    right: 18px;
+  }
+
+  .brand {
+    font-size: 10px;
+    letter-spacing: 3px;
+  }
+
+  .title {
+    font-size: clamp(23px, 6.5vw, 34px);
+    line-height: 1.65;
+  }
+
+  .eyebrow {
+    margin-bottom: 17px;
+    letter-spacing: 3px;
+  }
+
+  .overlay {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .buttons {
+    gap: 10px;
+    margin-top: 25px;
+  }
+
+  .btn {
+    min-width: 125px;
+    min-height: 48px;
+    padding: 12px 16px;
+    font-size: 12px;
+  }
+
+  .sound {
+    right: 16px;
+    bottom: max(16px, env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-height: 600px) {
+  .overlay {
+    padding-top: 55px;
+    padding-bottom: 65px;
+  }
+
+  .eyebrow {
+    margin-bottom: 10px;
+  }
+
+  .title {
+    font-size: clamp(21px, 4vw, 31px);
+    line-height: 1.45;
+  }
+
+  .subtitle {
+    margin-top: 8px;
+  }
+
+  .buttons {
+    margin-top: 16px;
+  }
+
+  .btn {
+    min-height: 43px;
+    padding: 10px 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
+</style>
+</head>
+
+<body>
+<main class="stage" id="stage">
+
+  <video
+    id="video"
+    class="visible"
+    playsinline
+    webkit-playsinline
+    autoplay
+    muted
+    preload="auto"
+    disablepictureinpicture
+    controlslist="nodownload noplaybackrate"
+  >
+    <source src="video1.mp4" type="video/mp4">
+    შენი ბრაუზერი ვიდეოს დაკვრას ვერ უზრუნველყოფს.
+  </video>
+
+  <div class="shade"></div>
+  <div class="grain"></div>
+
+  <header class="topline">
+    <div class="brand">A LITTLE STORY</div>
+    <div class="scene-number" id="sceneNumber">01 / 05</div>
+  </header>
+
+  <section class="overlay" id="overlay" aria-live="polite">
+    <div class="content">
+      <span class="eyebrow" id="eyebrow">ერთი პატარა ისტორია</span>
+      <h1 class="title" id="title">გავაგრძელოთ?</h1>
+      <p class="subtitle" id="subtitle"></p>
+      <div class="buttons" id="buttons"></div>
+    </div>
+  </section>
+
+  <section class="ending" id="ending">
+    <h2 class="ending-text">ტკბილი ძილი,<br><span>ნინიკო ❤️</span></h2>
+  </section>
+
+  <button
+    class="sound"
+    id="soundButton"
+    aria-label="ხმის ჩართვა"
+    title="ხმა"
+    type="button"
+  >
+    <svg id="soundIcon" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="1.6"
+      stroke-linecap="round" stroke-linejoin="round">
+      <path d="M11 5 6 9H3v6h3l5 4V5Z"/>
+      <path d="m16 9 5 6m0-6-5 6"/>
+    </svg>
+  </button>
+
+  <div class="progress">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+</main>
+
+<script>
+(() => {
+  "use strict";
+
+  const video = document.getElementById("video");
+  const overlay = document.getElementById("overlay");
+  const eyebrow = document.getElementById("eyebrow");
+  const title = document.getElementById("title");
+  const subtitle = document.getElementById("subtitle");
+  const buttons = document.getElementById("buttons");
+  const sceneNumber = document.getElementById("sceneNumber");
+  const ending = document.getElementById("ending");
+  const progressFill = document.getElementById("progressFill");
+  const soundButton = document.getElementById("soundButton");
+  const soundIcon = document.getElementById("soundIcon");
+
+  let currentScene = 1;
+  let sceneFinished = false;
+  let isMuted = true;
+  let loadingScene = 1;
+
+  const scenes = {
+    1: {
+      duration: 10,
+      ended: {
+        eyebrow: "ერთი პატარა ისტორია",
+        title: "გავაგრძელოთ?",
+        subtitle: "ეს მხოლოდ დასაწყისია...",
+        buttons: [
+          { text: "კი, გავაგრძელოთ", type: "primary", action: "next" },
+          { text: "არა", type: "secondary", action: "run" }
+        ]
+      }
+    },
+
+    2: {
+      duration: 10,
+      before: {
+        eyebrow: "სცენა მეორე",
+        title: "იცი რას გიზამ,<br>როცა მოფერება მოგინდება?",
+        subtitle: "",
+        buttons: [
+          { text: "არა", type: "primary", action: "play" }
+        ]
+      },
+      ended: {
+        eyebrow: "გადავიდეთ შემდეგზე?",
+        title: "გავაგრძელოთ?",
+        subtitle: "",
+        buttons: [
+          { text: "კი", type: "primary", action: "next" },
+          { text: "არა", type: "secondary", action: "run" }
+        ]
+      }
+    },
+
+    3: {
+      duration: 13,
+      before: {
+        eyebrow: "სცენა მესამე",
+        title: "ეს შენი ხასიათია,<br><span class='accent'>ნინიკო</span>",
+        subtitle: "",
+        buttons: [
+          { text: "ჩართვა", type: "primary", action: "play" }
+        ]
+      },
+      ended: {
+        eyebrow: "ისტორია გრძელდება",
+        title: "გავაგრძელოთ?",
+        subtitle: "",
+        buttons: [
+          { text: "კი", type: "primary", action: "next" },
+          { text: "არა", type: "secondary", action: "run" }
+        ]
+      }
+    },
+
+    4: {
+      duration: 10,
+      before: {
+        eyebrow: "სცენა მეოთხე",
+        title: "გაინტერესებს,<br>რას გიზამ ძილისწინ?",
+        subtitle: "",
+        buttons: [
+          { text: "კი", type: "primary", action: "play" }
+        ]
+      },
+      ended: {
+        eyebrow: "ბოლო სცენამდე",
+        title: "გავაგრძელოთ?",
+        subtitle: "",
+        buttons: [
+          { text: "კი", type: "primary", action: "next" },
+          { text: "არა", type: "secondary", action: "run" }
+        ]
+      }
+    },
+
+    5: {
+      duration: 10
+    }
+  };
+
+  function makeButton(config) {
+    const button = document.createElement("button");
+
+    button.className = "btn " +
+      (config.type === "primary" ? "btn-primary" : "btn-secondary");
+
+    button.textContent = config.text;
+    button.type = "button";
+
+    if (config.action === "run") {
+      button.addEventListener("pointerenter", event => {
+        if (event.pointerType === "mouse") {
+          moveButton(button);
+        }
+      });
+
+      button.addEventListener("pointerdown", event => {
+        if (event.pointerType !== "mouse") {
+          event.preventDefault();
+          moveButton(button);
+        }
+      });
+
+      button.addEventListener("click", event => {
+        event.preventDefault();
+        moveButton(button);
+      });
+
+      return button;
+    }
+
+    button.addEventListener("click", () => {
+      if (config.action === "next") {
+        goToScene(currentScene + 1);
+      } else if (config.action === "play") {
+        startCurrentVideo();
+      } else if (config.action === "retry") {
+        loadVideo(currentScene, true);
+      }
+    });
+
+    return button;
+  }
+
+  function moveButton(button) {
+    const margin = 20;
+    const rect = button.getBoundingClientRect();
+
+    const maxX = Math.max(margin, window.innerWidth - rect.width - margin);
+    const maxY = Math.max(margin, window.innerHeight - rect.height - margin);
+
+    const x = margin + Math.random() * Math.max(0, maxX - margin);
+    const y = margin + Math.random() * Math.max(0, maxY - margin);
+
+    button.style.position = "fixed";
+    button.style.left = x + "px";
+    button.style.top = y + "px";
+    button.style.zIndex = "20";
+  }
+
+  function showOverlay(config) {
+    buttons.innerHTML = "";
+
+    eyebrow.textContent = config.eyebrow || "";
+    title.innerHTML = config.title || "";
+    subtitle.textContent = config.subtitle || "";
+
+    (config.buttons || []).forEach(item => {
+      buttons.appendChild(makeButton(item));
+    });
+
+    overlay.classList.add("active");
+  }
+
+  function hideOverlay() {
+    overlay.classList.remove("active");
+    buttons.innerHTML = "";
+  }
+
+  function showBeforeScene(number) {
+    const scene = scenes[number];
+
+    if (scene && scene.before) {
+      showOverlay(scene.before);
+    }
+  }
+
+  function showVideoError(number) {
+    video.classList.remove("visible");
+
+    showOverlay({
+      eyebrow: "ვიდეო ვერ ჩაიტვირთა",
+      title: "ვიდეოს გახსნა ვერ მოხერხდა",
+      subtitle: "შეამოწმე ფაილის სახელი, ფორმატი და მდებარეობა.",
+      buttons: [
+        {
+          text: "ხელახლა ცდა",
+          type: "primary",
+          action: "retry"
+        }
+      ]
+    });
+
+    console.error("ვიდეო ვერ ჩაიტვირთა: video" + number + ".mp4");
+  }
+
+  function loadVideo(number, autoplay) {
+    if (number < 1 || number > 5) return;
+
+    currentScene = number;
+    loadingScene = number;
+    sceneFinished = false;
+
+    progressFill.style.width = "0%";
+    sceneNumber.textContent =
+      String(number).padStart(2, "0") + " / 05";
+
+    ending.classList.remove("active");
+    hideOverlay();
+
+    video.classList.remove("visible");
+    video.pause();
+
+    video.onloadeddata = null;
+    video.onerror = null;
+
+    video.src = "video" + number + ".mp4";
+    video.muted = isMuted;
+    video.playsInline = true;
+    video.preload = "auto";
+    video.load();
+
+    video.onloadeddata = () => {
+      if (currentScene !== number) return;
+
+      video.classList.add("visible");
+
+      if (number === 5 || autoplay) {
+        playVideo();
+      } else {
+        showBeforeScene(number);
+      }
+    };
+
+    video.onerror = () => {
+      if (currentScene !== number) return;
+      showVideoError(number);
+    };
+  }
+
+  function playVideo() {
+    hideOverlay();
+    sceneFinished = false;
+    video.muted = isMuted;
+
+    const promise = video.play();
+
+    if (promise && typeof promise.catch === "function") {
+      promise.catch(() => {
+        if (currentScene !== 5) {
+          showOverlay({
+            eyebrow: "სცენა " + currentScene,
+            title: "მზად ხარ?",
+            subtitle: "დააჭირე ღილაკს ვიდეოს გასაშვებად.",
+            buttons: [
+              {
+                text: "ჩართვა",
+                type: "primary",
+                action: "play"
+              }
+            ]
+          });
+        }
+      });
+    }
+  }
+
+  function startCurrentVideo() {
+    video.muted = isMuted;
+    playVideo();
+  }
+
+  function goToScene(number) {
+    if (number > 5) return;
+
+    if (number === 5) {
+      loadVideo(5, true);
+    } else {
+      loadVideo(number, false);
+    }
+  }
+
+  video.addEventListener("ended", () => {
+    if (sceneFinished) return;
+
+    sceneFinished = true;
+    progressFill.style.width = "100%";
+
+    if (currentScene === 5) {
+      hideOverlay();
+      ending.classList.add("active");
+      return;
+    }
+
+    const config = scenes[currentScene]?.ended;
+
+    if (config) {
+      showOverlay(config);
+    }
+  });
+
+  video.addEventListener("timeupdate", () => {
+    const duration = video.duration || scenes[currentScene]?.duration || 10;
+
+    const percent = Math.min(
+      100,
+      (video.currentTime / duration) * 100
+    );
+
+    progressFill.style.width = percent + "%";
+  });
+
+  video.addEventListener("playing", () => {
+    video.classList.add("visible");
+  });
+
+  soundButton.addEventListener("click", () => {
+    isMuted = !isMuted;
+    video.muted = isMuted;
+
+    soundIcon.innerHTML = isMuted
+      ? '<path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="m16 9 5 6m0-6-5 6"/>'
+      : '<path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19 6a9 9 0 0 1 0 12"/>';
+
+    soundButton.setAttribute(
+      "aria-label",
+      isMuted ? "ხმის ჩართვა" : "ხმის გამორთვა"
+    );
+
+    if (!video.paused) {
+      video.play().catch(() => {});
+    }
+  });
+
+  /* პირველი ვიდეო ავტომატურად იწყება უხმო რეჟიმში */
+  video.src = "video1.mp4";
+  video.muted = true;
+  video.load();
+
+  video.play().catch(() => {
+    if (currentScene === 1 && video.paused) {
+      showOverlay({
+        eyebrow: "დასაწყისი",
+        title: "დავიწყოთ?",
+        subtitle: "დააჭირე ღილაკს პირველი ვიდეოს გასაშვებად.",
+        buttons: [
+          {
+            text: "ჩართვა",
+            type: "primary",
+            action: "play"
+          }
+        ]
+      });
+    }
+  });
+})();
+</script>
+</body>
+</html>
